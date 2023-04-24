@@ -26,3 +26,16 @@ class TestLocation(unittest.TestCase):
             fetch_location("Nonexistent University")
             
         mock_geolocator.geocode.assert_called_once_with("Nonexistent University")
+
+    def test_fetch_location_additional():
+        # Test University of Pernambuco
+        result = location.fetch_location("University of Pernambuco")
+        assert result == {'lat': -8.0278246, 'lng': -34.9505235}
+
+        # Test University of Singapore
+        result = location.fetch_location("University of Singapore")
+        assert result == {'lat': 1.2965886, 'lng': 103.7766665}
+
+        # Test University of Madagascar
+        with pytest.raises(location.LocationNotFoundError):
+            location.fetch_location("University of Madagascar")
