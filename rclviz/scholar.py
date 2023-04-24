@@ -1,7 +1,7 @@
 from typing import Dict
 from tqdm import tqdm
 from scholarly import scholarly
-from rclviz.location import fetch_location
+from location import fetch_location
 
 def clean_affiliation(affiliation : str) -> str:
     separator = ','

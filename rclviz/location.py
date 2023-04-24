@@ -1,3 +1,4 @@
+from typing import Dict
 from geopy.geocoders import Nominatim
 
 def fetch_location(university: str) -> Dict[str, float]:

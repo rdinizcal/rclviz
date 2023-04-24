@@ -1,6 +1,7 @@
 import sys
-from rclviz import kml
-from rclviz.scholarly import get_coauthors
+from kml import generate_kml_file
+from location import fetch_location
+from scholar import get_coauthors
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -24,4 +25,4 @@ if __name__ == '__main__':
         sys.exit()
 
     # Generate KML file
-    kml.generate_kml_file(name, university, coauthors)
+    generate_kml_file(name, university, coauthors)

@@ -1,8 +1,8 @@
 from typing import Dict
 from lxml import etree
 from tqdm import tqdm
-from rclviz.scholarly import get_coauthors
-from rclviz.location import fetch_location
+from scholar import get_coauthors
+from location import fetch_location
 
 def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     """Generates a KML file with the locations of authors and their connections."""
@@ -32,10 +32,10 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     folder_name = etree.SubElement(folder, 'name')
     folder_name.text = 'Co-Authors (according to Google Scholar)'
     for coauthor, coauthor_affiliation in tqdm(coauthors.items()):
-    coauthor_location = fetch_location(coauthor_affiliation)
-    if coauthor_location['lng'] == 0 or coauthor_location['lat'] == 0:
-        print(f"Could not find {coauthor}'s location.")
-        continue
+        coauthor_location = fetch_location(coauthor_affiliation)
+        if coauthor_location['lng'] == 0 or coauthor_location['lat'] == 0:
+            print(f"Could not find {coauthor}'s location.")
+            continue
 
     # Add co-author's placemark
     coauthor_placemark = etree.SubElement(folder, 'Placemark')
@@ -67,8 +67,8 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     line_string_coordinates_coordinates = etree.SubElement(line_string_coordinates, 'coordinates')
     line_string_coordinates_coordinates.text = f"{location['lng']},{location['lat']},0 {coauthor_location['lng']},{coauthor_location['lat']},0"
 
-# Write KML document to file
-with open(f'{name}.kml', 'wb') as kml_file:
-    kml_file.write(etree.tostring(kml_doc, pretty_print=True))
+    # Write KML document to file
+    with open(f'{name}.kml', 'wb') as kml_file:
+        kml_file.write(etree.tostring(kml_doc, pretty_print=True))
 
-print(f'KML file generated for {name} with co-authors.')
+    print(f'KML file generated for {name} with co-authors.')
