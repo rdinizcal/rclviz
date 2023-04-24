@@ -2,7 +2,7 @@ from typing import Dict
 from lxml import etree
 from tqdm import tqdm
 from scholar import get_coauthors
-from location import fetch_location
+from location import fetch_location, LocationNotFoundError
 
 def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     """Generates a KML file with the locations of authors and their connections."""
@@ -31,41 +31,44 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     folder = etree.SubElement(document, 'Folder')
     folder_name = etree.SubElement(folder, 'name')
     folder_name.text = 'Co-Authors (according to Google Scholar)'
-    for coauthor, coauthor_affiliation in tqdm(coauthors.items()):
-        coauthor_location = fetch_location(coauthor_affiliation)
-        if coauthor_location['lng'] == 0 or coauthor_location['lat'] == 0:
-            print(f"Could not find {coauthor}'s location.")
-            continue
+    for coauthor, coauthor_affiliation in tqdm(coauthors.items(), desc="Drawing connection"):
+        try:
+            coauthor_location = fetch_location(coauthor_affiliation)
+        except LocationNotFoundError as e:
+            print(f"Error: {str(e)}")
+            continue # skip this university and move on to the next one
 
-    # Add co-author's placemark
-    coauthor_placemark = etree.SubElement(folder, 'Placemark')
-    coauthor_name = etree.SubElement(coauthor_placemark, 'name')
-    coauthor_name.text = coauthor
-    coauthor_description = etree.SubElement(coauthor_placemark, 'description')
-    coauthor_description.text = f'{coauthor} at {coauthor_affiliation}'
-    coauthor_point = etree.SubElement(coauthor_placemark, 'Point')
-    coauthor_coordinates = etree.SubElement(coauthor_point, 'coordinates')
-    coauthor_coordinates.text = f"{coauthor_location['lng']},{coauthor_location['lat']},0"
+        # Add co-author's placemark
+        # coauthor_placemark = etree.SubElement(folder, 'Placemark')
+        # coauthor_name = etree.SubElement(coauthor_placemark, 'name')
+        # coauthor_name.text = coauthor
 
-    # Add connection between author and co-author
-    line_string = etree.SubElement(folder, 'Placemark')
-    line_string_name = etree.SubElement(line_string, 'name')
-    line_string_name.text = f'{name} - {coauthor}'
-    line_string_description = etree.SubElement(line_string, 'description')
-    line_string_description.text = f'{name} and {coauthor} have collaborated on a project.'
-    line_string_style = etree.SubElement(line_string, 'Style')
-    line_string_line_style = etree.SubElement(line_string_style, 'LineStyle')
-    line_string_line_style_width = etree.SubElement(line_string_line_style, 'width')
-    line_string_line_style_width.text = '2'
-    line_string_line_style_color = etree.SubElement(line_string_line_style, 'color')
-    line_string_line_style_color.text = 'ff0000ff'
-    line_string_coordinates = etree.SubElement(line_string, 'LineString')
-    line_string_coordinates_tessellate = etree.SubElement(line_string_coordinates, 'tessellate')
-    line_string_coordinates_tessellate.text = '1'
-    line_string_coordinates_altitude_mode = etree.SubElement(line_string_coordinates, 'altitudeMode')
-    line_string_coordinates_altitude_mode.text = 'clampToGround'
-    line_string_coordinates_coordinates = etree.SubElement(line_string_coordinates, 'coordinates')
-    line_string_coordinates_coordinates.text = f"{location['lng']},{location['lat']},0 {coauthor_location['lng']},{coauthor_location['lat']},0"
+        # coauthor_description = etree.SubElement(coauthor_placemark, 'description')
+        # coauthor_description.text = f'{coauthor} at {coauthor_affiliation}'
+
+        # coauthor_point = etree.SubElement(coauthor_placemark, 'Point')
+        # coauthor_coordinates = etree.SubElement(coauthor_point, 'coordinates')
+        # coauthor_coordinates.text = f"{coauthor_location['lng']},{coauthor_location['lat']},0"
+        
+        # Add connection between author and co-author
+        line_string = etree.SubElement(folder, 'Placemark')
+        line_string_name = etree.SubElement(line_string, 'name')
+        line_string_name.text = f'{name} - {coauthor}'
+        line_string_description = etree.SubElement(line_string, 'description')
+        line_string_description.text = f'{name} and {coauthor} have collaborated on a project.'
+        line_string_style = etree.SubElement(line_string, 'Style')
+        line_string_line_style = etree.SubElement(line_string_style, 'LineStyle')
+        line_string_line_style_width = etree.SubElement(line_string_line_style, 'width')
+        line_string_line_style_width.text = '2'
+        line_string_line_style_color = etree.SubElement(line_string_line_style, 'color')
+        line_string_line_style_color.text = 'ff0000ff'
+        line_string_coordinates = etree.SubElement(line_string, 'LineString')
+        line_string_coordinates_tessellate = etree.SubElement(line_string_coordinates, 'tessellate')
+        line_string_coordinates_tessellate.text = '1'
+        line_string_coordinates_altitude_mode = etree.SubElement(line_string_coordinates, 'altitudeMode')
+        line_string_coordinates_altitude_mode.text = 'clampToGround'
+        line_string_coordinates_coordinates = etree.SubElement(line_string_coordinates, 'coordinates')
+        line_string_coordinates_coordinates.text = f"{location['lng']},{location['lat']},0 {coauthor_location['lng']},{coauthor_location['lat']},0"
 
     # Write KML document to file
     with open(f'{name}.kml', 'wb') as kml_file:

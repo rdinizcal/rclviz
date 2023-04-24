@@ -21,8 +21,15 @@ if __name__ == '__main__':
     coauthors = get_coauthors(name)
 
     if not coauthors:
-        print('Could not find any coauthors for the given name.')
+        print('Error: Could not find any coauthors for the given name.')
         sys.exit()
+    
+    # Get location
+    try:
+        fetch_location(university)
+    except LocationNotFoundError as e:
+        print(f"Error: {str(e)}")
+        sys.exit() # skip this university and move on to the next one
 
     # Generate KML file
     generate_kml_file(name, university, coauthors)
