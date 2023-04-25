@@ -39,6 +39,9 @@ To generate a map in Google Maps using the resulting .kml file, follow these ste
 
 **Note:** Google Maps may not display all of the connections if there are too many authors or connections in the .kml file.
 
+### Example of rclviz used in google maps. Ran for three researchers.
+<img src="https://user-images.githubusercontent.com/18559295/234214008-58a0e90d-0a82-4711-bc27-67f2fddeac79.png" alt="examplar from google maps" width="50%" height="50%">
+
 ## Contributing
 
 Contributions are welcome! If you'd like to contribute to this project, please fork the repository and submit a pull request.
