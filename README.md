@@ -22,7 +22,7 @@ pip install -r requirements.txt
 Then, simply run the script and provide the <name> and <affiliation> of the researcher as arguments:
 
 ```example
-python plotter.py "Paulo Freire" "Universidade Federal de Pernambuco"
+python3 rclviz "Paulo Freire" "Universidade Federal de Pernambuco"
 ```
 
 The script will generate a KML file with the name of the researcher and their coauthors. The file can be opened with Google Earth or other KML viewers.
