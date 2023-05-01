@@ -30,7 +30,7 @@ def get_coauthors(name: str) -> Dict[str, str]:
         author_dict = next(search_query)
         author = scholarly.fill(author_dict)
         coauthors = {}
-        for coauthor in tqdm(author['coauthors'], desc="Fetching coauthors"):
+        for coauthor in tqdm(author['coauthors'], desc="Fetching " +name+ "'s coauthors"):
             try:
                 coauthor_dict = next(scholarly.search_author(coauthor['name']))
                 coauthor = scholarly.fill(coauthor_dict)
