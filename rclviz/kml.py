@@ -28,30 +28,16 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     author_coordinates.text = f"{location['lng']},{location['lat']},0"
 
     # Add co-authors' placemarks and connections
-    folder = etree.SubElement(document, 'Folder')
-    folder_name = etree.SubElement(folder, 'name')
-    folder_name.text = 'Co-Authors (according to Google Scholar)'
-    for coauthor, coauthor_affiliation in tqdm(coauthors.items(), desc="Drawing connection"):
+    # coauthor_folder = etree.SubElement(author_placemark, 'Folder')
+    for coauthor, coauthor_affiliation in tqdm(coauthors.items(), desc="Connecting "+name+ " to their co-authors"):
         try:
             coauthor_location = fetch_location(coauthor_affiliation)
         except LocationNotFoundError as e:
             print(f"Error: {str(e)}")
             continue # skip this university and move on to the next one
-
-        # Add co-author's placemark
-        # coauthor_placemark = etree.SubElement(folder, 'Placemark')
-        # coauthor_name = etree.SubElement(coauthor_placemark, 'name')
-        # coauthor_name.text = coauthor
-
-        # coauthor_description = etree.SubElement(coauthor_placemark, 'description')
-        # coauthor_description.text = f'{coauthor} at {coauthor_affiliation}'
-
-        # coauthor_point = etree.SubElement(coauthor_placemark, 'Point')
-        # coauthor_coordinates = etree.SubElement(coauthor_point, 'coordinates')
-        # coauthor_coordinates.text = f"{coauthor_location['lng']},{coauthor_location['lat']},0"
         
         # Add connection between author and co-author
-        line_string = etree.SubElement(folder, 'Placemark')
+        line_string = etree.SubElement(document, 'Placemark')
         line_string_name = etree.SubElement(line_string, 'name')
         line_string_name.text = f'{name} - {coauthor}'
         line_string_description = etree.SubElement(line_string, 'description')
@@ -59,9 +45,9 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
         line_string_style = etree.SubElement(line_string, 'Style')
         line_string_line_style = etree.SubElement(line_string_style, 'LineStyle')
         line_string_line_style_width = etree.SubElement(line_string_line_style, 'width')
-        line_string_line_style_width.text = '2'
+        line_string_line_style_width.text = '1'
         line_string_line_style_color = etree.SubElement(line_string_line_style, 'color')
-        line_string_line_style_color.text = 'ff0000ff'
+        line_string_line_style_color.text = '000000'
         line_string_coordinates = etree.SubElement(line_string, 'LineString')
         line_string_coordinates_tessellate = etree.SubElement(line_string_coordinates, 'tessellate')
         line_string_coordinates_tessellate.text = '1'
