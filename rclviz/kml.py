@@ -6,11 +6,12 @@ from location import fetch_location, LocationNotFoundError
 
 def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     """Generates a KML file with the locations of authors and their connections."""
+    
     # Fetch location of main author's university
     location = fetch_location(university)
     if location['lng'] == 0 or location['lat'] == 0:
-        print("Could not find the resercher's location.")
-        print("Terminating the program...") 
+        print("Could not find the researcher's location.")
+        print("Terminating the program...")
         return None
 
     # Create KML document
@@ -26,9 +27,8 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
     author_point = etree.SubElement(author_placemark, 'Point')
     author_coordinates = etree.SubElement(author_point, 'coordinates')
     author_coordinates.text = f"{location['lng']},{location['lat']},0"
-
+    
     # Add co-authors' placemarks and connections
-    # coauthor_folder = etree.SubElement(author_placemark, 'Folder')
     for coauthor, coauthor_affiliation in tqdm(coauthors.items(), desc="Connecting "+name+ " to their co-authors"):
         try:
             coauthor_location = fetch_location(coauthor_affiliation)
@@ -42,12 +42,6 @@ def generate_kml_file(name: str, university: str, coauthors: Dict[str, str]):
         line_string_name.text = f'{name} - {coauthor}'
         line_string_description = etree.SubElement(line_string, 'description')
         line_string_description.text = f'{name} and {coauthor} have collaborated on a project.'
-        line_string_style = etree.SubElement(line_string, 'Style')
-        line_string_line_style = etree.SubElement(line_string_style, 'LineStyle')
-        line_string_line_style_width = etree.SubElement(line_string_line_style, 'width')
-        line_string_line_style_width.text = '1'
-        line_string_line_style_color = etree.SubElement(line_string_line_style, 'color')
-        line_string_line_style_color.text = '000000'
         line_string_coordinates = etree.SubElement(line_string, 'LineString')
         line_string_coordinates_tessellate = etree.SubElement(line_string_coordinates, 'tessellate')
         line_string_coordinates_tessellate.text = '1'
