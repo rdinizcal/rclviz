@@ -1,6 +1,7 @@
 from typing import Dict
 from tqdm import tqdm
 from scholarly import scholarly
+import requests
 
 def clean_affiliation(affiliation: str) -> str:
     possible_separators = [',', ' at ', ' @ ', ' - ', ' and ']
@@ -45,3 +46,26 @@ def get_coauthors(name: str) -> Dict[str, str]:
         print(f"No results found for {name}")
     except Exception as e:
         print(f"Error occurred while fetching data for {name}: {str(e)}")
+
+def get_coauthors_semantics_scholar(name: str) -> Dict[str, str]:
+    try:
+        response = requests.get(f'https://api.semanticscholar.org/v1/author/search?author={name}&limit=1')
+        data = response.json()
+        if 'error' in data:
+            print(f"Error occurred while fetching data for {name}: {data['error']}")
+            return {}
+        author_id = data[0]['authorId']
+        coauthors = {}
+        response = requests.get(f'https://api.semanticscholar.org/v1/author/{author_id}/co-authors')
+        data = response.json()
+        for coauthor in tqdm(data['coAuthors'], desc=f"Fetching {name}'s co-authors"):
+            try:
+                coauthor_name = coauthor['name']
+                coauthor_affiliation = coauthor.get('affiliation', '')
+                coauthors[coauthor_name] = coauthor_affiliation
+            except Exception as e:
+                print(f"Error occurred while fetching data for {coauthor_name}: {str(e)}")
+        return coauthors
+    except Exception as e:
+        print(f"Error occurred while fetching data for {name}: {str(e)}")
+        return {}
